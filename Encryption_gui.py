@@ -1,5 +1,6 @@
 import PySimpleGUI as Psg
 import Encryption
+import os
 
 Psg.theme('SandyBeach')
 SYM_MENU_BUTTONS = ["Authenticated Encryption", "Unauthenticated Encryption",
@@ -110,7 +111,8 @@ def AsymGenKeysWindow():
 def SymMenuWindow():
     layout = [[Psg.Text("Symmetric Encryption / Decryption",
                         font="Lucida")],
-              [Psg.Button("Authenticated"), Psg.Button("Unauthenticated")],
+              [Psg.Button(SYM_MENU_BUTTONS[0]), Psg.Button(SYM_MENU_BUTTONS[1])],
+              [Psg.Button(SYM_MENU_BUTTONS[2]), Psg.Button(SYM_MENU_BUTTONS[3])],
               [Psg.Button("Settings"), Psg.Button("Back")]]
     
     return Psg.Window(title="Symmetric Encryption / Decryption",
@@ -122,9 +124,9 @@ def SymMenuWindow():
 def SymAuthWindow():
     layout = [[Psg.Text("Symmetric Authenticated Encryption / Decryption",
                         font="Lucida")],
-              [Psg.Combo(SYM_UNAUTH_ALGOS,
+              [Psg.Combo(SYM_AUTH_ALGOS,
                          key="SymAlgo",
-                         default_value=SYM_UNAUTH_ALGOS[0])],
+                         default_value=SYM_AUTH_ALGOS[0])],
               [Psg.Button(SYM_MENU_BUTTONS[0]), Psg.Button(SYM_MENU_BUTTONS[2])],
               [Psg.Button("Back")]]
 
@@ -137,9 +139,9 @@ def SymAuthWindow():
 def SymUnAuthWindow():
     layout = [[Psg.Text("Symmetric Unauthenticated Encryption / Decryption",
                         font="Lucida")],
-              [Psg.Combo(SYM_AUTH_ALGOS,
+              [Psg.Combo(SYM_UNAUTH_ALGOS,
                          key="SymAlgo",
-                         default_value=SYM_AUTH_ALGOS[0])],
+                         default_value=SYM_UNAUTH_ALGOS[0])],
               [Psg.Button(SYM_MENU_BUTTONS[1]), Psg.Button(SYM_MENU_BUTTONS[3])],
               [Psg.Button("Back")]]
 
@@ -152,10 +154,13 @@ def SymUnAuthWindow():
 def SymAuthEncWindow():
     layout = [[Psg.Text("Symmetric Authenticated Encryption",
                         font="Lucida")],
+              
               [Psg.Input(key="Filename"), Psg.FileBrowse("Upload File")],
               [Psg.Input(password_char="*", key="Password"), Psg.Text("Password")],
               [Psg.Input(key="OutFolder"), Psg.FolderBrowse("Output Folder")],
-              [Psg.Submit(), Psg.Button("Back")]]
+              [Psg.Combo(SYM_AUTH_ALGOS,
+                         key="SymAlgo",
+                         default_value=SYM_AUTH_ALGOS[0]), Psg.Submit(), Psg.Button("Back")]]
 
     return Psg.Window(title="Symmetric Authenticated Encryption",
                       layout=layout,
@@ -166,11 +171,13 @@ def SymAuthEncWindow():
 def SymAuthDecWindow():
     layout = [[Psg.Text("Symmetric Authenticated Decryption",
                         font="Lucida")],
-              [Psg.Input(), Psg.FileBrowse("Upload File")],
-              [Psg.Input(password_char="*"), Psg.Text("Password")],
+              [Psg.Input(key="Filename"), Psg.FileBrowse("Upload File")],
+              [Psg.Input(password_char="*", key="Password"), Psg.Text("Password")],
               [Psg.Input(key="Key"), Psg.FileBrowse("Key File")],
               [Psg.Input(key="OutFolder"), Psg.FolderBrowse("Output Folder")],
-              [Psg.Submit(), Psg.Button("Back")]]
+              [Psg.Combo(SYM_AUTH_ALGOS,
+                         key="SymAlgo",
+                         default_value=SYM_AUTH_ALGOS[0]), Psg.Submit(), Psg.Button("Back")]]
     
     return Psg.Window(title="Symmetric Authenticated Encryption",
                       layout=layout,
@@ -183,7 +190,9 @@ def SymUnAuthEncWindow():
                         font="Lucida")],
               [Psg.Input(key="Filename"), Psg.FileBrowse("Upload File")],
               [Psg.Input(key="OutFolder"), Psg.FolderBrowse("Output Folder")],
-              [Psg.Submit(), Psg.Button("Back")]]
+              [Psg.Combo(SYM_UNAUTH_ALGOS,
+                         key="SymAlgo",
+                         default_value=SYM_UNAUTH_ALGOS[0]), Psg.Submit(), Psg.Button("Back")]]
 
     return Psg.Window(title="Symmetric Authenticated Encryption",
                       layout=layout,
@@ -196,7 +205,9 @@ def SymUnAuthDecWindow():
                         font="Lucida")],
               [Psg.Input(key="Filename"), Psg.FileBrowse("Upload File")],
               [Psg.Input(key="OutFolder"), Psg.FolderBrowse("Output Folder")],
-              [Psg.Submit(), Psg.Button("Back")]]
+              [Psg.Combo(SYM_UNAUTH_ALGOS,
+                         key="SymAlgo",
+                         default_value=SYM_UNAUTH_ALGOS[0]), Psg.Submit(), Psg.Button("Back")]]
 
     return Psg.Window(title="Symmetric Authenticated Encryption",
                       layout=layout,
@@ -229,8 +240,7 @@ def AsymEncWindowFunc():
             enc_file = Encryption.AsymmetricEncDecFile(filename=values.get("Filename"),
                                                        output_folder=values.get("OutFolder"))
             enc_file.AsymmetricEncFile(pub_key=values.get("PubKey"))
-            Psg.Popup("Successful",
-                      location=(800, 600))
+            Psg.Popup("Successful Encryption")
 
     asym_enc_window.close()
     AsymMenuWindowFunc()
@@ -249,8 +259,7 @@ def AsymDecWindowFunc():
             dec_file = Encryption.AsymmetricEncDecFile(filename=values.get("Filename"),
                                                        output_folder=values.get("OutFolder"))
             dec_file.AsymmetricDecFile(priva_key=values.get("PrivKey"))
-            Psg.Popup("Successful",
-                      location=(800, 600))
+            Psg.Popup("Successful Decryption")
 
     asym_dec_window.close()
     AsymMenuWindowFunc()
@@ -265,7 +274,10 @@ def AsymGenPrivKeyWindowFunc():
             break
     
         if event == "Submit":
-            print("AsymGenPrivKeyWindowFunc:\n", values)
+            priv_key = Encryption.AsymmetricEncryptionPrivateKey(os.path.join(values.get('PrivKeyFolder'),
+                                                                              values.get('PrivKeyName')))
+            priv_key.GenRSAPrivKey()
+            Psg.Popup("Successfully created Private Key.")
 
     asym_gen_priv_key_window.close()
     AsymGenKeysWindowFunc()
@@ -280,7 +292,10 @@ def AsymGenPubKeyWindowFunc():
             break
         
         if event == "Submit":
-            print("AsymGenPrivKeyWindowFunc:\n", values)
+            pub_key = Encryption.AsymmetricEncryptionPublicKey(os.path.join(values.get('PubKeyFolder'),
+                                                                            values.get('PubKeyName')))
+            pub_key.GenPublicKey(values.get('PrivKey'))
+            Psg.Popup("Successfully created Public Key.")
 
     asym_gen_pub_key_window.close()
     AsymGenKeysWindowFunc()
@@ -329,48 +344,6 @@ def AsymMenuWindowFunc():
     main()
 
 
-def SymAuthWindowFunc():
-    sym_auth_window_func = SymAuthWindow()
-    
-    while True:
-        event, values = sym_auth_window_func.read()
-        
-        if event in (Psg.WIN_CLOSED, "Back"):
-            break
-            
-        if event == SYM_MENU_BUTTONS[0]:
-            sym_auth_window_func.close()
-            SymAuthEncWindowFunc()
-            
-        elif event == SYM_MENU_BUTTONS[2]:
-            sym_auth_window_func.close()
-            SymAuthDecWindowFunc()
-            
-    sym_auth_window_func.close()
-    SymMenuWindowFunc()
-
-
-def SymUnAuthWindowFunc():
-    sym_unauth_window_func = SymUnAuthWindow()
-    
-    while True:
-        event, values = sym_unauth_window_func.read()
-        
-        if event in (Psg.WIN_CLOSED, "Back"):
-            break
-        
-        if event == SYM_MENU_BUTTONS[1]:
-            sym_unauth_window_func.close()
-            SymUnauthEncWindowFunc()
-        
-        elif event == SYM_MENU_BUTTONS[3]:
-            sym_unauth_window_func.close()
-            SymAuthDecWindowFunc()
-    
-    sym_unauth_window_func.close()
-    SymMenuWindowFunc()
-
-
 def SymAuthEncWindowFunc():
     sym_auth_enc_window = SymAuthEncWindow()
     
@@ -384,9 +357,10 @@ def SymAuthEncWindowFunc():
                                                               enc_algo=values.get("SymAlgo"),
                                                               output=values.get('OutFolder'))
             enc_file.SymmetricEncFile()
+            Psg.Popup("Successful Encryption")
     
     sym_auth_enc_window.close()
-    SymAuthWindowFunc()
+    SymMenuWindowFunc()
 
 
 def SymUnauthEncWindowFunc():
@@ -402,9 +376,10 @@ def SymUnauthEncWindowFunc():
                                                                  enc_algo=values.get("SymAlgo"),
                                                                  output=values.get("OutFolder"))
             enc_file.SymmetricEncWithoutAuth()
+            Psg.Popup("Successful Encryption")
 
     sym_unauth_enc_window.close()
-    SymUnAuthWindowFunc()
+    SymMenuWindowFunc()
 
 
 def SymAuthDecWindowFunc():
@@ -421,8 +396,9 @@ def SymAuthDecWindowFunc():
                                                               auth_tag=values.get('Password'),
                                                               enc_algo=values.get("SymAlgo"),
                                                               output=values.get('OutFolder'))
-            
+
             dec_file.SymmetricDecFile(key=values.get("Key"))
+            Psg.Popup("Successful Decryption")
     
     sym_auth_dec_window.close()
     SymMenuWindowFunc()
@@ -442,6 +418,7 @@ def SymUnAuthDecWindowFunc():
                                                                  enc_algo=values.get("SymAlgo"),
                                                                  output=values.get("OutFolder"))
             dec_file.SymmetricDecWithoutAuth()
+            Psg.Popup("Successful Decryption")
     
     sym_unauth_dec_window.close()
     SymMenuWindowFunc()
@@ -472,13 +449,21 @@ def SymMenuWindowFunc():
         event, values = sym_menu_window.read()
         if event in (Psg.WIN_CLOSED, "Back"):
             break
-        if event == "Authenticated":
+        if event == SYM_MENU_BUTTONS[0]:
             sym_menu_window.close()
-            SymAuthWindowFunc()
+            SymAuthEncWindowFunc()
         
-        elif event == "Unauthenticated":
+        elif event == SYM_MENU_BUTTONS[1]:
             sym_menu_window.close()
-            SymUnAuthWindowFunc()
+            SymUnauthEncWindowFunc()
+
+        elif event == SYM_MENU_BUTTONS[2]:
+            sym_menu_window.close()
+            SymAuthDecWindowFunc()
+
+        elif event == SYM_MENU_BUTTONS[3]:
+            sym_menu_window.close()
+            SymUnAuthDecWindowFunc()
         
         elif event == "Settings":
             sym_menu_window.close()
